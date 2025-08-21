@@ -1,7 +1,8 @@
 # Notification Mark
 
 Минимальное приложение для отображения уведомлений от вебхука в реальном времени.
-
+![Main](https://github.com/PRVTPRO/FindFace-webhook-monitor/blob/acc5a1028a41b0457683078b73661aa18404d421/static/main.png)
+![Settings](https://github.com/PRVTPRO/FindFace-webhook-monitor/blob/acc5a1028a41b0457683078b73661aa18404d421/static/settings.png)
 ## Возможности
 
 - 🎨 Современный дизайн с поддержкой темной/светлой темы
