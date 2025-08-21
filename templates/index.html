@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="ru" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notification Mark</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    animation: {
+                        'fade-in': 'fadeIn 0.6s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                        'fade-out': 'fadeOut 0.6s ease-in',
+                        'scale-in': 'scaleIn 0.3s ease-out',
+                        'bounce-in': 'bounceIn 0.6s ease-out'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(-20px) scale(0.95)' },
+                            '100%': { opacity: '1', transform: 'translateY(0) scale(1)' }
+                        },
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' }
+                        },
+                        fadeOut: {
+                            '0%': { opacity: '1', transform: 'translateY(0) scale(1)' },
+                            '100%': { opacity: '0', transform: 'translateY(-20px) scale(0.95)' }
+                        },
+                        scaleIn: {
+                            '0%': { transform: 'scale(0.8)', opacity: '0' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        },
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '50%': { transform: 'scale(1.05)' },
+                            '70%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .notification-enter {
+            animation: fadeIn 0.6s ease-out;
+        }
+        .notification-exit {
+            animation: fadeOut 0.6s ease-in;
+        }
+        .notification-bounce {
+            animation: bounceIn 0.6s ease-out;
+        }
+        .progress-bar {
+            transition: width 0.1s linear;
+        }
+        
+        /* Стили для Empty state */
+        #emptyState {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 60vh;
+        }
+    </style>
+</head>
+<body class="h-full bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 transition-colors duration-300">
+    <div class="min-h-full flex flex-col">
+        <!-- Header -->
+        <header id="mainHeader" class="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm shadow-lg border-b border-gray-200/50 dark:border-gray-700/50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-20">
+                    <div class="flex items-center space-x-3">
+                        <a href="/" class="flex items-center space-x-3 hover:opacity-80 transition-opacity">
+                            <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-5 5v-5zM4 19h6v-6H4v6zM20 4h-6v6h6V4zM10 4H4v6h6V4z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h1 class="text-2xl font-bold bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                                    Notification Mark
+                                </h1>
+                                <p class="text-sm text-gray-500 dark:text-gray-400">Система мониторинга</p>
+                            </div>
+                        </a>
+                    </div>
+                    
+                    <div class="flex items-center space-x-4">
+                        <!-- Navigation -->
+                        <nav class="flex items-center space-x-2">
+                            <a href="/settings" class="px-4 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                                Настройки
+                            </a>
+                        </nav>
+                        
+                        <!-- Dark mode toggle -->
+                        <button id="darkModeToggle" class="p-3 rounded-xl bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-all duration-200 hover:scale-105 shadow-sm">
+                            <!-- Sun icon -->
+                            <svg id="sunIcon" class="w-6 h-6 text-gray-600 dark:text-gray-400 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
+                            </svg>
+                            <!-- Moon icon -->
+                            <svg id="moonIcon" class="w-6 h-6 text-gray-600 dark:text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <main class="flex-1 max-w-6xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+            <!-- Notifications container -->
+            <div id="notificationsContainer" class="space-y-6">
+                <!-- Notifications will be dynamically added here -->
+            </div>
+            
+            <!-- Empty state -->
+            <div id="emptyState" class="text-center py-20 flex flex-col items-center justify-center">
+                <!-- Заголовок -->
+                <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-8 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
+                    Нет активных уведомлений
+                </h3>
+                
+                <!-- Анимированные точки -->
+                <div class="flex justify-center space-x-3">
+                    <div class="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+                    <div class="w-3 h-3 bg-purple-500 rounded-full animate-bounce" style="animation-delay: 0.1s"></div>
+                    <div class="w-3 h-3 bg-pink-500 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Dark mode functionality
+        const darkModeToggle = document.getElementById('darkModeToggle');
+        const sunIcon = document.getElementById('sunIcon');
+        const moonIcon = document.getElementById('moonIcon');
+        
+        // Check for saved theme preference or default to light mode
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+        
+        // Toggle dark mode
+        darkModeToggle.addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+            
+            if (document.documentElement.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                localStorage.theme = 'light';
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        });
+
+        // Notification management
+        class NotificationManager {
+            constructor() {
+                this.container = document.getElementById('notificationsContainer');
+                this.notifications = [];
+                this.settings = {
+                    timeout: 10,
+                    showName: true,
+                    showPhoto: true,
+                    showCamera: true,
+                    showConfidence: true,
+                    showTime: true,
+                    showHeader: true
+                };
+                
+                this.loadSettings();
+                this.startPolling();
+                this.updateEmptyState();
+            }
+
+            async loadSettings() {
+                try {
+                    const response = await fetch('/api/settings');
+                    const settings = await response.json();
+                    this.settings = {
+                        timeout: settings.timeout || 10,
+                        showName: settings.showName !== false,
+                        showPhoto: settings.showPhoto !== false,
+                        showCamera: settings.showCamera !== false,
+                        showConfidence: settings.showConfidence !== false,
+                        showTime: settings.showTime !== false,
+                        showHeader: settings.showHeader !== false
+                    };
+                    
+                    // Управление видимостью заголовка
+                    const header = document.getElementById('mainHeader');
+                    if (header) {
+                        if (this.settings.showHeader) {
+                            header.style.display = 'block';
+                        } else {
+                            header.style.display = 'none';
+                        }
+                    }
+                    
+                    console.log('Settings loaded:', this.settings);
+                } catch (error) {
+                    console.error('Error loading settings:', error);
+                }
+            }
+
+            updateEmptyState() {
+                const emptyState = document.getElementById('emptyState');
+                if (emptyState) {
+                    if (this.notifications.length === 0) {
+                        emptyState.style.display = 'flex';
+                    } else {
+                        emptyState.style.display = 'none';
+                    }
+                }
+            }
+
+            addNotification(notification) {
+                // Проверяем, нет ли уже такого уведомления
+                if (this.notifications.find(n => n.id === notification.id)) {
+                    return;
+                }
+                
+                this.notifications.push(notification);
+                this.renderNotification(notification);
+                this.updateEmptyState();
+                
+                // Удаляем уведомление через заданное время
+                setTimeout(() => {
+                    this.removeNotification(notification.id);
+                }, this.settings.timeout * 1000);
+            }
+
+            removeNotification(id) {
+                const element = document.querySelector(`[data-notification-id="${id}"]`);
+                if (element) {
+                    element.classList.add('notification-fade-out');
+                    setTimeout(() => {
+                        element.remove();
+                        this.notifications = this.notifications.filter(n => n.id !== id);
+                        this.updateEmptyState();
+                    }, 600);
+                }
+            }
+
+            renderNotification(notification) {
+                const notificationElement = document.createElement('div');
+                notificationElement.className = 'notification-bounce bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-6 hover:shadow-2xl transition-all duration-300 hover:scale-[1.02]';
+                notificationElement.setAttribute('data-notification-id', notification.id);
+                
+                const confidence = Math.round(notification.confidence * 100);
+                const timestamp = new Date(notification.timestamp).toLocaleTimeString('ru-RU');
+                
+                // Создаем прогресс-бар для времени жизни уведомления
+                const progressBarId = `progress-${notification.id}`;
+                
+                // Отладочная информация
+                console.log('Notification data:', notification);
+                console.log('Settings:', this.settings);
+                console.log('Show photo:', this.settings.showPhoto);
+                console.log('Thumbnail:', notification.thumbnail);
+                
+                // Собираем информацию для отображения
+                const infoItems = [];
+                
+                if (this.settings.showCamera) {
+                    infoItems.push(`
+                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                            </svg>
+                            <span class="font-medium">Камера:</span>
+                            <span>${this.escapeHtml(notification.camera_name)}</span>
+                        </div>
+                    `);
+                }
+                
+                if (this.settings.showConfidence) {
+                    infoItems.push(`
+                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium">Уверенность:</span>
+                            <span class="font-semibold text-green-600 dark:text-green-400">${confidence}%</span>
+                        </div>
+                    `);
+                }
+                
+                if (this.settings.showTime) {
+                    infoItems.push(`
+                        <div class="flex items-center space-x-2 text-gray-600 dark:text-gray-300">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            <span class="font-medium">Время:</span>
+                            <span>${timestamp}</span>
+                        </div>
+                    `);
+                }
+                
+                // Проверяем наличие фото
+                const hasPhoto = this.settings.showPhoto && notification.thumbnail && notification.thumbnail.trim() !== '';
+                console.log('Has photo:', hasPhoto);
+                
+                notificationElement.innerHTML = `
+                    <div class="relative">
+                        <!-- Progress bar -->
+                        <div class="absolute top-0 left-0 right-0 h-1 bg-gray-200 dark:bg-gray-700 rounded-t-2xl overflow-hidden">
+                            <div id="${progressBarId}" class="h-full bg-gradient-to-r from-green-400 to-blue-500 progress-bar" style="width: 100%"></div>
+                        </div>
+                        
+                        <div class="pt-2">
+                            <div class="flex items-start space-x-4">
+                                ${hasPhoto ? `
+                                    <div class="flex-shrink-0">
+                                        <img src="${this.escapeHtml(notification.thumbnail)}" 
+                                             alt="Фото события" 
+                                             class="w-16 h-16 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
+                                             onerror="this.style.display='none'; console.log('Image failed to load:', this.src);"
+                                             onload="console.log('Image loaded successfully:', this.src);">
+                                    </div>
+                                ` : ''}
+                                
+                                <div class="flex-1">
+                                    ${this.settings.showName ? `
+                                        <div class="flex items-center space-x-3 mb-3">
+                                            <div class="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                                            <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+                                                ${this.escapeHtml(notification.name)}
+                                            </h3>
+                                        </div>
+                                    ` : ''}
+                                    
+                                    ${infoItems.length > 0 ? `
+                                        <div class="grid grid-cols-1 md:grid-cols-${Math.min(infoItems.length, 3)} gap-4 text-sm">
+                                            ${infoItems.join('')}
+                                        </div>
+                                    ` : ''}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Add to the beginning of the container
+                this.container.insertBefore(notificationElement, this.container.firstChild);
+                
+                // Анимация прогресс-бара
+                const progressBar = document.getElementById(progressBarId);
+                if (progressBar) {
+                    let width = 100;
+                    const interval = setInterval(() => {
+                        width -= 100 / (this.settings.timeout * 10); // Обновляем каждые 0.1 секунды
+                        progressBar.style.width = Math.max(0, width) + '%';
+                        if (width <= 0) {
+                            clearInterval(interval);
+                        }
+                    }, 100);
+                }
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+
+            async startPolling() {
+                setInterval(async () => {
+                    try {
+                        const response = await fetch('/api/notifications');
+                        const data = await response.json();
+                        
+                        // Добавляем новые уведомления
+                        data.notifications.forEach(notification => {
+                            if (!this.notifications.find(n => n.id === notification.id)) {
+                                this.addNotification(notification);
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error fetching notifications:', error);
+                    }
+                }, 2000);
+            }
+        }
+
+        // Initialize notification manager when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            new NotificationManager();
+        });
+    </script>
+</body>
+</html>
